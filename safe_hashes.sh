@@ -164,6 +164,10 @@ declare -A -r API_URLS=(
     ["worldchain"]="https://safe-transaction-worldchain.safe.global"
     ["xlayer"]="https://safe-transaction-xlayer.safe.global"
     ["zksync"]="https://safe-transaction-zksync.safe.global"
+    ["berachain"]="https://transaction.safe.berachain.com"
+    ["ink"]="https://explorer-sepolia.inkonchain.com/api"
+    ["flare"]="https://prod.flare.keypersafe.xyz/"
+    ["corn"]="https://safe-transaction-corn-maizenet.safe.onchainden.com"
 )
 
 # Define the chain IDs of the supported networks from the Safe transaction service.
@@ -189,6 +193,10 @@ declare -A -r CHAIN_IDS=(
     ["worldchain"]="480"
     ["xlayer"]="196"
     ["zksync"]="324"
+    ["berachain"]="80094"
+    ["ink"]="57073"
+    ["flare"]="14"
+    ["corn"]="21000000"
 )
 
 # Utility function to display the usage information.

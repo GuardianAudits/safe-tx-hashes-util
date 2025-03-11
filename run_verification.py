@@ -15,6 +15,10 @@ from pprint import pprint
 safe_urls = {
     "ethereum": "",
     "arbitrum": "",
+    "flare": "",
+    "berachain": "",
+    "corn": "",
+    "ink": "",
 }
 
 def scrape_gnosis_safe_transactions():
