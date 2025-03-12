@@ -165,7 +165,7 @@ declare -A -r API_URLS=(
     ["xlayer"]="https://safe-transaction-xlayer.safe.global"
     ["zksync"]="https://safe-transaction-zksync.safe.global"
     ["berachain"]="https://transaction.safe.berachain.com"
-    ["ink"]="https://explorer-sepolia.inkonchain.com/api"
+    ["ink"]="https://safe-transaction-ink.safe.global/"
     ["flare"]="https://prod.flare.keypersafe.xyz/"
     ["corn"]="https://safe-transaction-corn-maizenet.safe.onchainden.com"
 )
@@ -846,9 +846,17 @@ calculate_safe_hashes_bulk() {
         address=$(echo "$obj" | jq -r '.address')
         nonce=$(echo "$obj" | jq -r '.nonce')
         expected_safe_transaction_hash=$(echo "$obj" | jq -r '.expected_safe_transaction_hash')
-        expected_domain_hash=$(format_hash $(echo "$obj" | jq -r '.expected_domain_hash'))
-        expected_message_hash=$(format_hash $(echo "$obj" | jq -r '.expected_message_hash'))
+        expected_domain_hash=$(echo "$obj" | jq -r '.expected_domain_hash')
+        expected_message_hash=$(echo "$obj" | jq -r '.expected_message_hash')
         expected_data=$(echo "$obj" | jq -r '.expected_data')
+
+        if [ -n "$expected_domain_hash" ]; then
+            expected_domain_hash=$(format_hash "$expected_domain_hash")
+        fi
+
+        if [ -n "$expected_message_hash" ]; then
+            expected_message_hash=$(format_hash "$expected_message_hash")
+        fi
 
         OUTPUT="$(calculate_safe_hashes "--network" "$network" "--address" "$address" "--nonce" "$nonce")"
 
