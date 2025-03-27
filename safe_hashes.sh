@@ -164,6 +164,10 @@ declare -A -r API_URLS=(
     ["worldchain"]="https://safe-transaction-worldchain.safe.global"
     ["xlayer"]="https://safe-transaction-xlayer.safe.global"
     ["zksync"]="https://safe-transaction-zksync.safe.global"
+    ["berachain"]="https://transaction.safe.berachain.com"
+    ["ink"]="https://safe-transaction-ink.safe.global/"
+    ["flare"]="https://prod.flare.keypersafe.xyz/"
+    ["corn"]="https://safe-transaction-corn-maizenet.safe.onchainden.com"
 )
 
 # Define the chain IDs of the supported networks from the Safe transaction service.
@@ -189,6 +193,10 @@ declare -A -r CHAIN_IDS=(
     ["worldchain"]="480"
     ["xlayer"]="196"
     ["zksync"]="324"
+    ["berachain"]="80094"
+    ["ink"]="57073"
+    ["flare"]="14"
+    ["corn"]="21000000"
 )
 
 # Utility function to display the usage information.
@@ -245,6 +253,25 @@ print_field() {
     if [[ -t 1 ]] && tput sgr0 >/dev/null 2>&1; then
         # Terminal supports formatting.
         printf "%s: ${GREEN}%s${RESET}\n" "$label" "$value"
+    else
+        # Fallback for terminals without formatting support.
+        printf "%s: %s\n" "$label" "$value"
+    fi
+
+    # Print an empty line if requested.
+    if [[ "$empty_line" == "true" ]]; then
+        printf "\n"
+    fi
+}
+
+print_error() {
+    local label=$1
+    local value=$2
+    local empty_line="${3:-false}"
+
+    if [[ -t 1 ]] && tput sgr0 >/dev/null 2>&1; then
+        # Terminal supports formatting.
+        printf "%s: ${RED}%s${RESET}\n" "$label" "$value"
     else
         # Fallback for terminals without formatting support.
         printf "%s: %s\n" "$label" "$value"
@@ -772,4 +799,82 @@ EOF
         "$version"
 }
 
-calculate_safe_hashes "$@"
+
+compare_values() {
+    local expected="$1"
+    local actual="$2"
+    local field="$3"
+
+    if [ "$expected" == "$actual" ]; then
+        print_field "$field" "matches"
+    else
+        print_error "$field" "does not match"
+        print_error "Expected " "$expected"
+        print_error "Actual   " "$actual"
+    fi
+}
+
+
+calculate_safe_hashes_bulk() {
+    local bulk_file=""
+
+    # Parse the command line arguments.
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --help) usage 0 ;;
+            --bulk-file) bulk_file="$2"; shift 2 ;;
+            --list-networks) list_networks ;;
+            *) echo "Unknown option: $1" >&2; usage ;;
+        esac
+    done
+
+
+    # Parse from JSON input file
+
+    if [ -z "$bulk_file" ]; then
+        echo "Usage: $0 <path-to-file>"
+        exit 1
+    fi
+
+    if [ ! -f "$bulk_file" ]; then
+        echo "Error: File not found -> $bulk_file"
+        exit 1
+    fi
+
+    jq -c '.[]' "$bulk_file" | while read -r obj; do
+        network=$(echo "$obj" | jq -r '.network')
+        address=$(echo "$obj" | jq -r '.address')
+        nonce=$(echo "$obj" | jq -r '.nonce')
+        expected_safe_transaction_hash=$(echo "$obj" | jq -r '.expected_safe_transaction_hash')
+        expected_domain_hash=$(echo "$obj" | jq -r '.expected_domain_hash')
+        expected_message_hash=$(echo "$obj" | jq -r '.expected_message_hash')
+        expected_data=$(echo "$obj" | jq -r '.expected_data')
+
+        if [ -n "$expected_domain_hash" ]; then
+            expected_domain_hash=$(format_hash "$expected_domain_hash")
+        fi
+
+        if [ -n "$expected_message_hash" ]; then
+            expected_message_hash=$(format_hash "$expected_message_hash")
+        fi
+
+        OUTPUT="$(calculate_safe_hashes "--network" "$network" "--address" "$address" "--nonce" "$nonce")"
+
+        safe_transaction_hash="$(awk -F': ' '/^Safe transaction hash:/{print $2}' <<< "$OUTPUT")"
+        domain_hash="$(awk -F': ' '/^Domain hash:/{print $2}' <<< "$OUTPUT")"
+        message_hash="$(awk -F': ' '/^Message hash:/{print $2}' <<< "$OUTPUT")"
+        data="$(awk -F': ' '/^Data:/{print $2}' <<< "$OUTPUT")"
+        warning_line="$(awk '/WARNING:/{print $0}' <<< "$OUTPUT")"
+
+        echo "Checking network: $network, address: $address, nonce: $nonce..."
+        compare_values "$expected_safe_transaction_hash" "$safe_transaction_hash" "Safe transaction hash"
+        compare_values "$expected_domain_hash" "$domain_hash" "Domain hash"
+        compare_values "$expected_message_hash" "$message_hash" "Message hash"
+        compare_values "$expected_data" "$data" "Data"
+        echo "$warning_line"
+
+    done
+
+}
+
+calculate_safe_hashes_bulk "$@"
