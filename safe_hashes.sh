@@ -168,6 +168,8 @@ declare -A -r API_URLS=(
     ["ink"]="https://safe-transaction-ink.safe.global/"
     ["flare"]="https://prod.flare.keypersafe.xyz/"
     ["corn"]="https://safe-transaction-corn-maizenet.safe.onchainden.com"
+    ["unichain"]="https://safe-transaction-unichain.safe.global/"
+    ["sei"]="https://transaction.sei-safe.protofire.io"
 )
 
 # Define the chain IDs of the supported networks from the Safe transaction service.
@@ -197,6 +199,8 @@ declare -A -r CHAIN_IDS=(
     ["ink"]="57073"
     ["flare"]="14"
     ["corn"]="21000000"
+    ["unichain"]="130"
+    ["sei"]="1329"
 )
 
 # Utility function to display the usage information.

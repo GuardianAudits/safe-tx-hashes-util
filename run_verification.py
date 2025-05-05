@@ -13,19 +13,23 @@ from pprint import pprint
 
 # Simply add the network name and the URL to the transaction queue of the Safe to verify all of it's transactions
 safe_urls = {
-    "ethereum": "",
-    "arbitrum": "",
-    "flare": "",
-    "berachain": "",
-    "ink": "",
+    # "ethereum": "https://app.safe.global/transactions/queue?safe=eth:0x4DFF9b5b0143E642a3F63a5bcf2d1C328e600bf8",
+    # "arbitrum": "https://app.safe.global/transactions/queue?safe=arb1:0x4DFF9b5b0143E642a3F63a5bcf2d1C328e600bf8",
+    # "flare": "https://multisig.flare.network/transactions/queue?safe=flare:0x6ae078461f35c3cC216A71029F71ee7Bc4d9a10b",
+    # "berachain": "https://safe.berachain.com/transactions/queue?safe=berachain:0x425d1D17C33bdc0615eA18D1b18CCA7e14bEeb58",
+    "ink": "https://app.safe.global/transactions/queue?safe=ink:0xc95de55ce5e93f788A1Faab2A9c9503F51a5dAE2",
 }
 
 network_to_rpc = {
-    "ethereum": "https://rpc.ankr.com/eth",
+    "ethereum": "https://eth-mainnet.g.alchemy.com/v2/NZMxbTFkijopq9I0cAU88Mt0HE4xvgtX",
     "arbitrum": "https://arb1.arbitrum.io/rpc",
-    "flare": "https://rpc.ankr.com/flare",
-    "berachain": "https://cdn.routescan.io/api/evm/80094/rpc",
-    "ink": "https://rpc-qnd.inkonchain.com",
+    "flare": "https://flare-api.flare.network/ext/bc/C/rpc",
+    "berachain": "https://rpc.berachain.com/",
+    "ink": "https://rpc-gel.inkonchain.com",
+    "unichain": "https://unichain-rpc.publicnode.com",
+    "sei": "https://evm-rpc.sei-apis.com",
+    "corn": "https://mainnet.corn-rpc.com",
+    "optimism": "https://mainnet.optimism.io/"
 }
 
 network_to_safe_address = {
@@ -34,6 +38,10 @@ network_to_safe_address = {
     "flare": "0x6ae078461f35c3cC216A71029F71ee7Bc4d9a10b",
     "berachain": "0x425d1D17C33bdc0615eA18D1b18CCA7e14bEeb58",
     "ink": "0xc95de55ce5e93f788A1Faab2A9c9503F51a5dAE2",
+    "unichain": "0x4DFF9b5b0143E642a3F63a5bcf2d1C328e600bf8",
+    "sei": "0x4DFF9b5b0143E642a3F63a5bcf2d1C328e600bf8",
+    "corn": "0x57d798f9d3B014bAC81A6B9fb3c18c0242A9411E",
+    "optimism": "0x4DFF9b5b0143E642a3F63a5bcf2d1C328e600bf8",
 }
 
 # Notice that Bera is Alternate2
@@ -308,6 +316,7 @@ def simulate_actions():
                     transaction.get("to_address"),
                     "--rpc-url",
                     rpc_url,
+                    # "http://127.0.0.1:8545",
                     "--from",
                     safe_address,
                     "--data",
@@ -316,6 +325,7 @@ def simulate_actions():
                 ],
                 check=True
             )
+            print("AFTER")
             print(result)
 
 if __name__ == "__main__":
