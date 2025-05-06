@@ -14,10 +14,10 @@ from pprint import pprint
 # Simply add the network name and the URL to the transaction queue of the Safe to verify all of it's transactions
 safe_urls = {
     # "ethereum": "https://app.safe.global/transactions/queue?safe=eth:0x4DFF9b5b0143E642a3F63a5bcf2d1C328e600bf8",
-    # "arbitrum": "https://app.safe.global/transactions/queue?safe=arb1:0x4DFF9b5b0143E642a3F63a5bcf2d1C328e600bf8",
+    "arbitrum": "https://app.safe.global/transactions/queue?safe=arb1:0x4DFF9b5b0143E642a3F63a5bcf2d1C328e600bf8",
     # "flare": "https://multisig.flare.network/transactions/queue?safe=flare:0x6ae078461f35c3cC216A71029F71ee7Bc4d9a10b",
     # "berachain": "https://safe.berachain.com/transactions/queue?safe=berachain:0x425d1D17C33bdc0615eA18D1b18CCA7e14bEeb58",
-    "ink": "https://app.safe.global/transactions/queue?safe=ink:0xc95de55ce5e93f788A1Faab2A9c9503F51a5dAE2",
+    # "ink": "https://app.safe.global/transactions/queue?safe=ink:0xc95de55ce5e93f788A1Faab2A9c9503F51a5dAE2",
 }
 
 network_to_rpc = {
@@ -49,6 +49,8 @@ network_to_safe_address = {
 def scrape_gnosis_safe_transactions():
     chrome_options = Options()
     # chrome_options.add_argument("--headless")  # Uncomment for headless mode
+    chrome_options.add_experimental_option("detach", True)
+
     driver = webdriver.Chrome(options=chrome_options)
 
     transaction_verification_items = []
@@ -142,10 +144,10 @@ def scrape_gnosis_safe_transactions():
                 if isAlternate:
                     advanced_details_selector = advanced_details_selector_alternate
 
-                print(advanced_details_selector)
-                print(isAlternate)
+                print("Advanced details selector:", advanced_details_selector)
+                print("Is alternative:", isAlternate)
 
-                driver.execute_script("window.scrollBy(0, 100);")
+                driver.execute_script("window.scrollBy(0, 140);")
                 
                 try: 
                     WebDriverWait(driver, 5).until(
@@ -163,7 +165,7 @@ def scrape_gnosis_safe_transactions():
                 advanced_details_button.click()
                                         
                 data_to_address_text_selector = f"#__next > div.styles_main__ml_aX > div > main > div > div > div > div:nth-child({ui_index}) > div > div > div > div > div > div > div.styles_details___YvqT.undefined > div.styles_txSummary__CFbSQ > div > div:nth-child(2) > div.MuiGrid-root.MuiGrid-item.MuiGrid-grid-xs-true.mui-style-kxu0dz > div > div > div > div.MuiBox-root.mui-style-b5p5gz > span > span"
-                data_to_address_text_selector_first = f"#__next > div.styles_main__ml_aX > div > main > div > div > div > div.MuiPaper-root.MuiPaper-elevation.MuiPaper-rounded.MuiPaper-elevation0.MuiAccordion-root.MuiAccordion-rounded.Mui-expanded.styles_listItem__Y1EBh.mui-style-1qrr0iz > div > div > div > div > div > div > div.styles_details___YvqT.undefined > div.styles_txSummary__CFbSQ > div > div:nth-child(2) > div.MuiGrid-root.MuiGrid-item.MuiGrid-grid-xs-true.mui-style-kxu0dz > div > div > div > div.MuiBox-root.mui-style-b5p5gz > span > span"                         
+                data_to_address_text_selector_first = f"#__next > div.styles_main__ml_aX > div > main > div > div > div > div.MuiPaper-root.MuiPaper-elevation.MuiPaper-rounded.MuiPaper-elevation0.MuiAccordion-root.MuiAccordion-rounded.Mui-expanded.styles_listItem__Y1EBh.mui-style-40pw8v > div > div > div > div > div > div > div.styles_details___YvqT.undefined > div.styles_txSummary__CFbSQ > div > div:nth-child(2) > div.MuiGrid-root.MuiGrid-item.MuiGrid-grid-xs-true.mui-style-kxu0dz > div > div > div > div.MuiBox-root.mui-style-b5p5gz > span > span"                         
 
                 if not isAlternate2:
                     data_to_address_copy_selector_first_alternate = f"#__next > div.styles_main__ml_aX > div > main > div > div > div > div.MuiPaper-root.MuiPaper-elevation.MuiPaper-rounded.MuiPaper-elevation0.MuiAccordion-root.MuiAccordion-rounded.Mui-expanded.styles_listItem__Y1EBh.mui-style-1tktuix > div.MuiCollapse-root.MuiCollapse-vertical.MuiCollapse-entered.mui-style-c4sutr > div > div > div > div > div > div.styles_txSigners__Zdzmy > ul > li.MuiListItem-root.MuiListItem-gutters.MuiListItem-padding.mui-style-vtcp25 > div.MuiListItemText-root.mui-style-1tsvksn > span > div > div.MuiBox-root.mui-style-i6bazn > div > span > button"
@@ -212,9 +214,9 @@ def scrape_gnosis_safe_transactions():
                 data_text = driver.find_element(By.CSS_SELECTOR, data_text_selector).text.replace(" Show less", "")
                 print(data_text)
 
-                expected_safe_transaction_selector = f"#__next > div.styles_main__ml_aX > div > main > div > div > div > div:nth-child({ui_index}) > div > div > div > div > div > div > div.styles_details___YvqT > div.styles_txSummary__CFbSQ > div > div.MuiStack-root.mui-style-1821gv5 > div:nth-child(1) > div.MuiGrid-root.MuiGrid-item.MuiGrid-grid-xs-true.mui-style-kxu0dz > div"
-                expected_domain_hash_selector = f"#__next > div.styles_main__ml_aX > div > main > div > div > div > div:nth-child({ui_index}) > div > div > div > div > div > div > div.styles_details___YvqT > div.styles_txSummary__CFbSQ > div > div.MuiStack-root.mui-style-1821gv5 > div:nth-child(2) > div.MuiGrid-root.MuiGrid-item.MuiGrid-grid-xs-true.mui-style-kxu0dz > div"
-                expected_message_hash_selector = f"#__next > div.styles_main__ml_aX > div > main > div > div > div > div:nth-child({ui_index}) > div > div > div > div > div > div > div.styles_details___YvqT > div.styles_txSummary__CFbSQ > div > div.MuiStack-root.mui-style-1821gv5 > div:nth-child(3) > div.MuiGrid-root.MuiGrid-item.MuiGrid-grid-xs-true.mui-style-kxu0dz > div"
+                expected_domain_hash_selector = f"#__next > div.styles_main__ml_aX > div > main > div > div > div > div:nth-child({ui_index}) > div > div > div > div > div > div > div.styles_details___YvqT > div.styles_txSummary__CFbSQ > div > div.MuiStack-root.mui-style-1821gv5 > div:nth-child(1) > div.MuiGrid-root.MuiGrid-item.MuiGrid-grid-xs-true.mui-style-kxu0dz > div"
+                expected_message_hash_selector = f"#__next > div.styles_main__ml_aX > div > main > div > div > div > div:nth-child({ui_index}) > div > div > div > div > div > div > div.styles_details___YvqT > div.styles_txSummary__CFbSQ > div > div.MuiStack-root.mui-style-1821gv5 > div:nth-child(2) > div.MuiGrid-root.MuiGrid-item.MuiGrid-grid-xs-true.mui-style-kxu0dz > div"
+                expected_safe_transaction_selector = f"#__next > div.styles_main__ml_aX > div > main > div > div > div > div:nth-child({ui_index}) > div > div > div > div > div > div > div.styles_details___YvqT > div.styles_txSummary__CFbSQ > div > div.MuiStack-root.mui-style-1821gv5 > div:nth-child(3) > div.MuiGrid-root.MuiGrid-item.MuiGrid-grid-xs-true.mui-style-kxu0dz > div"
                 nonce_selector = f"#__next > div.styles_main__ml_aX > div > main > div > div > div > div:nth-child({ui_index}) > div > div > div > div > div > div > div.styles_details___YvqT > div.styles_txSummary__CFbSQ > div > div:nth-child(11) > div.MuiGrid-root.MuiGrid-item.MuiGrid-grid-xs-true.mui-style-kxu0dz"
 
                 if isAlternate:
@@ -269,8 +271,12 @@ def scrape_gnosis_safe_transactions():
 
                     if ui_index == 2:
                         data_to_address_text_selector = data_to_address_text_selector_first
-
+                    print("To address before")
+                    WebDriverWait(driver, 20).until(
+                        EC.presence_of_all_elements_located((By.CSS_SELECTOR, data_to_address_text_selector))
+                    )
                     to_address = driver.find_element(By.CSS_SELECTOR, data_to_address_text_selector).text
+                    print("To address after")
 
                 transaction_verification_items.append({
                     "network": network,
